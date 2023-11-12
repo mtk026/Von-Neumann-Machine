@@ -1,0 +1,221 @@
+In this take home exam you will be experimenting with a given process on number sequences. This process
+resemble the action of a simplied Von Neumann Machine. You will observe that the number sequence (which
+will change from problem to problem) acts like a machine code program loaded into the memory of a Von
+Neumann machine. The two registers R1, R2 and the instruction pointer I, the only three internals of the
+process, carry out the functions of the data, address, condition and the instruction registers of a Von Neumann
+machine.
+Our process (lets name it from now on as the THE machine) works on a sequence of integers each of
+which are in the range [􀀀127; +127]. Here is an example for such a sequence:
+0 1 2 3 4 5 6 7 8
+1 14 2 33 16 8 8 0 0
+If we are speaking about the value of the 3rd element in the sequence then we will denote this by enclosing the
+3 into square brackets, like [3]. In the example above [3] is 33.
+Furthermore, the THE machine has three registers which we name as R1, R2 an I. Each one of R1 and
+R2 can hold an integer in the range [􀀀127; +127]. Storing negative values into I is not allowed, it can hold
+any integer in the range [0; +255] (though in your exercises the values of I will be about 10-30, at most). The
+square bracket notation applies for these registers as well. Namely [R1] means the content of the R1th element
+in the sequence. So, for instance, if R1 has at any moment the value 3 and if at that moment the 3rd sequence
+element is 33 (as it is in the example above) then [R1] refers that 33.
+The interesting point is that the values in the sequence as well as the values in the registers can be changed
+freely to new values. When this is the case the former value is erased and the new value is substituted in that
+place. We will call this action an assignment and will represent it by the following notation:
+place   new value
+1
+Here are some assignment examples:
+R1   5 R1 is set to the value 5
+R1   R2 R1 is set to the same value R2 is holding now.
+(Attention: This does not mean that any following changes on R2 will eect
+the value stored in R1)
+R2   [2] R2 is set to the 2nd value in the sequence.
+[0]   R1 The 0th (zeroth) value in the sequence is changed to be the same value that
+is in R1.
+I   I + 1 The content of I is incremented by one.
+The number of changes is not limited and can be performed as many times as desired on any register or sequence
+element.
+Given a sequence, THE machine starts with all its registers having 0 (zero) value. It works by repeatatively
+going through a process cycle until a halt instruction is executed. A process cycle is:
+1. Take [I] as an instruction.
+2. If this instruction is the halt instruction then terminate the process,
+3. else perform the action associated with that instruction.
+4. Continue with step (1).
+If any instruction described in the following two pages computes a result (at any cycle) that falls out of the
+limits then the machine automatically halts. The register in which the over
+ow/under
+ow occurs has an
+unknown value. In your answer sheet you indicate this by drawing an * character in place of the value in the
+corresponding register box.
+The THE machine accepts 17 instructions which are explained below. Instructions are recognized as integers
+[0,1,. . . ,16].
+Instruction 0
+Halt the process..
+Instruction 1
+Load R1 with the next number in the sequence.
+R1   [I + 1] ; I   I + 2
+Instruction 2
+Load R2 with the next number in the sequence.
+R2   [I + 1] ; I   I + 2
+Instruction 3
+Load R1 with the sequence element which is at the position given as the next number in the sequence.
+R1   [[I + 1]] ; I   I + 2
+Instruction 4
+Load R2 with the sequence element which is at the position given as the next number in the sequence.
+R2   [[I + 1]] ; I   I + 2
+2
+Instruction 5
+Load R1 with the content of R2.
+R1   R2 ; I   I + 1
+Instruction 6
+Load R1 with the sequence element which is at the position R2.
+R1   [R2] ; I   I + 1
+Instruction 7
+Change the sequence element which is at the position R1 to be the content of R2.
+[R1]   R2 ; I   I + 1
+Instruction 8
+Change the sequence element which is at the position given as the next number in the sequence to the content
+of R1.
+[[I + 1]]   R1 ; I   I + 2
+Instruction 9
+Take the sequence element which is at the position given as the next number in the sequence as the next
+instruction to be performed.
+I   [I + 1]
+Instruction 10
+If R1 contains zero continue with the sequence element following the next one as the next instruction to be
+performed, otherwise act like the instruction 9.
+if R1 = 0 : I   I + 2
+otherwise : I   [I + 1]
+Instruction 11
+Increment R1 by the content of R2.
+R1   R1 + R2 ; I   I + 1
+Instruction 12
+Decrement R1 by the content of R2.
+R1   R1 􀀀 R2 ; I   I + 1
+Instruction 13
+Multiply R1 by the content of R2.
+R1   R1  R2 ; I   I + 1
+Instruction 14
+Divide R1 by the content of R2 (integer division).
+R1   R1  R2 ; I   I + 1
+3
+Instruction 15
+Change the sign of the value in R1.
+R1   􀀀R1 ; I   I + 1
+Instruction 16
+Compare the content of R1 with the content of R2.
+if R1 = R2 : R1   0
+if R1 > R2 : R1   1
+otherwise : R1   􀀀1
+always I   I + 1
+An Example
+If THE machine is submitted the below given sequence, it will compute the sum of its 2nd and 3rd elements,
+then compare this sum with the 4th element. If the sum equals the 4th element then the 5th element of the
+sequence is changed to 1 else it is changed to 0.
+9 6 12 27 39 3 2 4 3 11 4 10 20 1 9 22 0 5 7 0
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+99 4 16 2 2 1
+We will go through each cycle of the process and explain it:
+Cycle 1
+The machine starts now. So the registers are as follows:
+R1 R2 I
+0 0 0
+Since I contains 0, the 0th (zeroth) element of the sequence, [I] is fetched. This will be our current
+instruction. Looking at the sequence you may realize that this element is 9. Look at the denition of
+the instruction 9 (given on the previous page), you will see that the action of the instruction 9 is:
+I   [I + 1]
+I + 1 is 1 and therefore [I + 1] is simply [1], in other words the 1st element of the sequence. That is 6.
+So the value in I is changed by the assignment operation to be 6. And now the registers are:
+R1 R2 I
+0 0 6
+Cycle 2
+I contains 6. The machine fetches [6] which is 3. Instruction 3 is dened as:
+R1   [[I + 1]] ; I   I + 2
+The rst assignment will change the content of R1 to be [[I + 1]]. Now do not panic! I was holding a
+value of 6 therefore the inner brackets are nothing else but
+[[ |I {+z 1}
+[6+1]
+]] which is [[7]]
+[7] is the 7th element of the sequence, namely 2. So [[7]] is nothing but [2]. As you must have got used to
+it by now, this is the 2nd element of the sequence, we go and fetch it. It is 12. Since the rst assignment
+was R1   [[I + 1]] this value found on the right hand side of the assignment, namely the 12, will be
+stored into R1. The second assignment increments the value of I by 2. Thus I is now 6 + 2 which is 8.
+At the end of this cycle the register contents are:
+4
+R1 R2 I
+12 0 8
+Cycle 3
+Since I is containing 8 we fetch [8] as the instruction of this cycle. The 8th element of the sequence is
+4. The instruction 4 is dened similar to the instruction 3 but now it is the R2 register that receives
+the value and not R1. Going through a very similar argumentation that we did for cycle 2, we conclude
+that R2 will be assigned the value [3] which is 27. Following this assignment, I will be incremented by
+2. That is how the registers look like:
+R1 R2 I
+12 27 10
+Cycle 4
+This cycle's instruction is [10]. Looking at the sequence we see that this is the instruction 11. An
+instruction which adds the content of R2 to the content of R1 and assigns the sum to R1(Please go and
+check the denition of instruction 11). So the following operation is performed:
+R1   12 + 27
+So, R1 is assigned a value of 39. Due to the denition of instruction 11, the I register is incremented by
+1. At the end of this cycle the registers read as:
+R1 R2 I
+39 27 11
+Cycle 5
+Our instruction is [11] which is 4. We have had a similar instruction in cycle 3. But this time [I + 1]
+is 4 which means that R2 is assigned the value [4]. From the sequence we get that this value is 39. So
+R2   39. By the denition, I is incremented by 2. Now the registers are:
+R1 R2 I
+39 39 13
+Cycle 6
+The instruction of this cycle is [13], namely 16. This is a comparison test performed between R1 and
+R2. If they are equal R1 is changed to 0, if the value of R1 is greater than the value of R2 then R1 is
+changed to 1. If it is the third possibility, which is the only one left, namely the case where the value
+of R1 is lesser than the value of R2 then R1 is changed to 􀀀1. In all cases I is incremented by one.
+Following this denition and looking at the contents of the registers we can conclude that THE machine
+will change R1 to 0 since both R1 and R2 have the value 39, hence they are equal. The registers are:
+R1 R2 I
+0 39 14
+5
+Cycle 7
+The instruction is [14] which reads as 10. This is a conditional jump (`jump on non-zero'). If the register
+R1 contains a non zero value then the instruction of the next cycle will be fetched from the sequence
+position that given at [I +1]. In our case the register R1 indeed contains a 0. So the jump will not take
+place and the I register will simply be incremented by 2. (If the jump would have taken place then I
+would be set to 20 and this would be the position in the sequence from which the instruction for cycle 8
+would be fetched) So the registers are
+R1 R2 I
+0 39 16
+Cycle 8
+The instruction is now [16], that is 2. This will load R2 with [I + 1]. In our case this is R2   [17] and
+will result in R2   1. For an instruction 2, I will be incremented by 2. At the end of this cycle we have
+in the registers
+R1 R2 I
+0 1 18
+Cycle 9
+The instruction is [18] which is 9 an instruction that performs an unconditional jump. I will be set to
+[I + 1] and that is 22. The registers are
+R1 R2 I
+0 1 22
+Cycle 10
+The instruction is [22] which is 1. This instruction will load R1 with [I + 1]. For our case this is 5.
+Instruction 1 increments I by 2. Now we have the registers as
+R1 R2 I
+5 1 24
+Cycle 11
+We are almost at the end! The instruction in turn is [24], that is 7. An instruction that performs
+[R1]   R2
+and then increment I by one. Due to this denition a [5]   1 is carried out. And for the rst time
+we have changed a value in the sequence. Now the 5th element is no more 99 but 1. This was the
+claimed action of the THE machine with this example sequence. After a following incrementation of I
+the registers are:
+R1 R2 I
+5 1 25
+Cycle 12
+Yes, unbeliveable but true, the machine stops and we all go home! The instruction for this cycle is [25]
+which is simply 0. And this means halt.
+6
+the nal picture of the sequence is:
+9 6 12 27 39 3 2 4 3 11 4 10 20 1 9 22 0 5 7 0
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+1 4 16 2 2 1
+For sake of completeness we display the registers at the moment of the halt:
+R1 R2 I
+5 1 25
